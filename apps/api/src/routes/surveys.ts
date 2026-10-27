@@ -185,7 +185,8 @@ surveysRouter.post("/surveys/:surveyId/responses", requireAuth, async (req: Auth
   if (!writer) { res.status(503).json({ error: { code: "SUPABASE_SERVICE_UNAVAILABLE", message: "Response writes are not configured on this server." } }); return; }
   const { data, error: responseError } = await writer.rpc("submit_survey_response", { p_survey_id: survey.id, p_workspace_id: survey.workspace_id, p_respondent_id: respondentId, p_session_key: survey.anonymous ? parsed.data.anonymousSessionKey : null, p_answers: parsed.data.answers.map((answer) => ({ question_id: answer.questionId, answer: answer.value })) });
   if (responseError) { const duplicate = responseError.message.includes("DUPLICATE_RESPONSE"); const limited = responseError.message.includes("SURVEY_LIMIT_REACHED"); res.status(duplicate || limited ? 409 : 500).json({ error: { code: duplicate ? "DUPLICATE_RESPONSE" : limited ? "SURVEY_LIMIT_REACHED" : "RESPONSE_CREATE_FAILED", message: duplicate ? "You have already responded to this survey." : limited ? "This survey has reached its response limit." : "Unable to save this response." } }); return; }
-  res.status(201).json({ data });
+  const reward = await writer.rpc("award_reward_points", { p_user_id: req.user.id, p_points: 10, p_source_type: "survey_response", p_source_id: survey.id, p_idempotency_key: `survey-response:${survey.id}:${req.user.id}`, p_description: "Submitted an eligible survey response." });
+  res.status(201).json({ data: { ...(data as Record<string, unknown>), reward: reward.data ?? null } });
 });
 
 surveysRouter.get("/surveys/:surveyId/analytics", requireAuth, async (req: AuthenticatedRequest, res) => {

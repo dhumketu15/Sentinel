@@ -15,6 +15,8 @@
     {"path":"/app/reports","title":"Audit reports and exports"},
     {"path":"/app/analytics","title":"Workspace analytics"},
     {"path":"/app/surveys","title":"Surveys and feedback"},
+    {"path":"/app/community","title":"Community discussions"},
+    {"path":"/app/rewards","title":"Rewards and badges"},
     {"path":"/app/:section","title":"BrandSentinel workspace"}
   ]
 }
