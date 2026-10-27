@@ -11,3 +11,10 @@ button, input { font: inherit; }
 :focus-visible { outline: 3px solid #a78bfa; outline-offset: 3px; }
 .font-display { font-family: Sora, "Noto Sans Devanagari", system-ui, sans-serif; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
+
+@media print {
+  @page { margin: 0.6in; }
+  body { background: white !important; }
+  .report-sheet { border: 0 !important; box-shadow: none !important; }
+  .break-inside-avoid { break-inside: avoid; }
+}

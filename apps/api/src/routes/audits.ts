@@ -44,7 +44,7 @@ async function runAudit(req: AuthenticatedRequest, input: z.infer<typeof createA
 auditsRouter.get("/audits", requireAuth, async (req: AuthenticatedRequest, res) => {
   const workspaceId = typeof req.query.workspaceId === "string" ? req.query.workspaceId : undefined; const client = clientFor(req);
   if (!workspaceId || !client) { res.status(!client ? 503 : 400).json({ error: { code: !client ? "SUPABASE_UNAVAILABLE" : "WORKSPACE_REQUIRED", message: !client ? "Audit service is not configured." : "A workspaceId query parameter is required." } }); return; }
-  const { data, error } = await client.from("audits").select("id, workspace_id, brand_id, guideline_version_id, content_type, content_text, status, overall_score, risk_class, summary, is_demo, created_at, completed_at, brands(name), brand_guideline_versions(version_number, title)").eq("workspace_id", workspaceId).order("created_at", { ascending: false }).limit(100);
+  const { data, error } = await client.from("audits").select("id, workspace_id, brand_id, guideline_version_id, content_type, content_text, status, overall_score, risk_class, summary, is_demo, created_at, completed_at, brands(name), brand_guideline_versions(version_number, title)").eq("workspace_id", workspaceId).eq("status", "completed").order("created_at", { ascending: false }).limit(100);
   if (error) { res.status(500).json({ error: { code: "AUDITS_LOOKUP_FAILED", message: "Unable to load audit history." } }); return; }
   res.json({ data: data ?? [] });
 });

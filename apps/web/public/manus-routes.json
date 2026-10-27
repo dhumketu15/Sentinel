@@ -11,6 +11,8 @@
     {"path":"/app/overview","title":"Workspace overview"},
     {"path":"/app/brands","title":"Brand profiles and guidelines"},
     {"path":"/app/audits","title":"Content audits"},
+    {"path":"/app/reports","title":"Audit reports and exports"},
+    {"path":"/app/analytics","title":"Workspace analytics"},
     {"path":"/app/:section","title":"BrandSentinel workspace"}
   ]
 }

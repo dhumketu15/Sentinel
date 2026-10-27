@@ -11,7 +11,7 @@ foundationRouter.get("/health", (_req, res) => {
 });
 
 foundationRouter.get("/readiness", (_req, res) => {
-  res.json({ data: { status: "ready", integrations: { supabase: hasSupabaseConfig, gemini: hasGeminiConfig, mode: hasGeminiConfig ? "live" : "demo" } } });
+  res.json({ data: { status: "ready", integrations: { supabase: hasSupabaseConfig, gemini: hasGeminiConfig, mode: "demo", note: "The current audit scorer is deterministic demo analysis; live Gemini auditing is not enabled in this slice." } } });
 });
 
 function userClient(req: AuthenticatedRequest) {
