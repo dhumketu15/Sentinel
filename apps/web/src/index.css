@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; font-family: Inter, "Noto Sans Devanagari", system-ui, sans-serif; background: #f8faff; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; background: #f8faff; }
+button, input { font: inherit; }
+::selection { background: #ddd6fe; color: #312e81; }
+:focus-visible { outline: 3px solid #a78bfa; outline-offset: 3px; }
+.font-display { font-family: Sora, "Noto Sans Devanagari", system-ui, sans-serif; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }

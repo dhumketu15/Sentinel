@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.vite/
+.env
+.env.*
+!.env.example
+.DS_Store
+coverage/
+*.log
+
+# Local Supabase CLI state
+.supabase/

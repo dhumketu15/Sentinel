@@ -1,0 +1,21 @@
+{
+  "name": "brandsentinel-ai",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "dev": "concurrently -k \"pnpm --filter @brandsentinel/web dev\" \"pnpm --filter @brandsentinel/api dev\"",
+    "dev:web": "pnpm --filter @brandsentinel/web dev",
+    "dev:api": "pnpm --filter @brandsentinel/api dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "db:check": "tsx supabase/scripts/check-schema.ts"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

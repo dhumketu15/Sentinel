@@ -1,0 +1,13 @@
+{
+  "routes": [
+    {"path":"/","title":"BrandSentinel AI"},
+    {"path":"/features","title":"Features"},
+    {"path":"/how-it-works","title":"How it works"},
+    {"path":"/community","title":"Community"},
+    {"path":"/brand-qa","title":"Brand Q&A"},
+    {"path":"/login","title":"Log in"},
+    {"path":"/register","title":"Create account"},
+    {"path":"/forgot-password","title":"Reset password"},
+    {"path":"/app/:section","title":"BrandSentinel workspace"}
+  ]
+}
