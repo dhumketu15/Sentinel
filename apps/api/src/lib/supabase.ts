@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { env, hasSupabaseConfig } from "../config/env.js";
+import { env, hasSupabaseConfig, hasUserScopedSupabaseConfig } from "../config/env.js";
 
 let adminClient: SupabaseClient | null = null;
 
@@ -22,8 +22,8 @@ export async function getUserFromAccessToken(accessToken: string) {
 }
 
 export function getUserScopedClient(accessToken: string): SupabaseClient | null {
-  if (!hasSupabaseConfig || !env.SUPABASE_URL) return null;
-  return createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY ?? env.SUPABASE_KEY ?? env.SUPABASE_SERVICE_ROLE_KEY ?? "", {
+  if (!hasUserScopedSupabaseConfig || !env.SUPABASE_URL) return null;
+  return createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY ?? env.SUPABASE_PUBLISHABLE_KEY ?? "", {
     auth: { autoRefreshToken: false, persistSession: false },
     global: { headers: { Authorization: `Bearer ${accessToken}` } },
   });

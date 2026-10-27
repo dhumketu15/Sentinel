@@ -1,3 +1,4 @@
+import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
@@ -9,7 +10,7 @@ import { errorHandler, notFound } from "./middleware/errors.js";
 
 const app = express();
 app.disable("x-powered-by");
-app.use(helmet({ crossOriginEmbedderPolicy: false, frameguard: false, contentSecurityPolicy: false }));
+app.use(helmet({ crossOriginEmbedderPolicy: false }));
 app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 app.use(express.json({ limit: "1mb" }));
 app.use(pinoHttp({ logger }));

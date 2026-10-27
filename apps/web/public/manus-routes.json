@@ -8,6 +8,7 @@
     {"path":"/login","title":"Log in"},
     {"path":"/register","title":"Create account"},
     {"path":"/forgot-password","title":"Reset password"},
+    {"path":"/app/overview","title":"Workspace overview"},
     {"path":"/app/:section","title":"BrandSentinel workspace"}
   ]
 }
