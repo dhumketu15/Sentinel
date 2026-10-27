@@ -38,6 +38,13 @@
 - [ ] Question types include single/multiple choice, rating, short/long text, yes/no, NPS-style, and lawful optional demographics. Consumers can discover eligible public surveys, submit type-valid answers once, receive confirmation, and earn rewards only when eligible.
 - [ ] Survey analytics report responses, accurate completion rate, distributions, averages, NPS, trends, and safeguarded written-feedback themes without overclaiming from small or biased samples.
 
+### Completed survey delivery slice — 2026-10-27
+
+- [x] The current survey slice provides a tenant-safe Supabase schema for surveys, typed questions, published/paused/closed lifecycle state, anonymous mode, maximum responses, thank-you messages, public share tokens, response records, answer records, duplicate-response indexes, and RLS policies.
+- [x] Business users with administrator/editor membership can create a validated draft, publish/pause/close it, and manage typed questions through server-validated API routes. Question replacement and settings-plus-question updates are transaction-scoped, advisory-locked, and blocked after responses exist.
+- [x] Authenticated consumers can discover published surveys in the protected application. Anonymous surveys also have a tokenized public route at `/survey/:publicToken`; public and signed-in submissions use server-side type validation, once-per-session/respondent deduplication, an atomic response cap, and confirmation messaging.
+- [x] Workspace administrators/editors can view stored response counts, distributions, rating averages, NPS, and written-response counts. Analytics is paged, RLS-scoped, and explicitly does not claim completion rate or generated written-feedback themes until start events and a safeguarded summarizer are implemented.
+
 ## Phase 6 — Community and rewards
 
 - [ ] Community supports posts, comments/replies, reactions, owned edit/delete, search, topic filters, profiles, attachments where permitted, pagination, loading/empty states, duplicate-reaction prevention, reports, moderation, server validation, spam controls, rate limits, and private-discussion boundaries.

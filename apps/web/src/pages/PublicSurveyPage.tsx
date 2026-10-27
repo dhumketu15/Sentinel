@@ -1,0 +1,39 @@
+import { useEffect, useState } from "react";
+import { Check, ClipboardList, Loader2, Send } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { Badge, Button, Card } from "../components/ui";
+import { apiFetch } from "../lib/api";
+
+type Question = { id: string; question_type: string; prompt: string; options: string[]; position: number; required: boolean };
+type PublicSurvey = { id: string; public_token: string; title: string; description?: string | null; anonymous: boolean; thank_you_message: string; brands?: { name: string } | null; survey_questions: Question[] };
+const inputClass = "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-normal text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-50";
+
+export function PublicSurveyPage() {
+  const { publicToken = "" } = useParams();
+  const [survey, setSurvey] = useState<PublicSurvey | null>(null);
+  const [answers, setAnswers] = useState<Record<string, string | number | boolean | string[]>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => { void apiFetch<{ data: PublicSurvey }>(`/public-surveys/${publicToken}`).then((response) => setSurvey(response.data)).catch((error) => setNotice(error instanceof Error ? error.message : "This survey link is not available.")).finally(() => setLoading(false)); }, [publicToken]);
+  function setAnswer(questionId: string, value: string | number | boolean | string[]) { setAnswers((current) => ({ ...current, [questionId]: value })); }
+  function renderQuestion(question: Question) {
+    const value = answers[question.id];
+    if (question.question_type === "single_choice") return <div className="grid gap-2">{question.options.map((option) => <label key={option} className="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-3 text-sm text-slate-700 hover:border-violet-300"><input type="radio" name={question.id} checked={value === option} onChange={() => setAnswer(question.id, option)} />{option}</label>)}</div>;
+    if (question.question_type === "multiple_choice") return <div className="grid gap-2">{question.options.map((option) => { const selected = Array.isArray(value) && value.includes(option); return <label key={option} className="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-3 text-sm text-slate-700 hover:border-violet-300"><input type="checkbox" checked={selected} onChange={(event) => setAnswer(question.id, event.target.checked ? [...(Array.isArray(value) ? value : []), option] : (Array.isArray(value) ? value.filter((item) => item !== option) : []))} />{option}</label>; })}</div>;
+    if (question.question_type === "rating") return <div className="flex flex-wrap gap-2">{[1, 2, 3, 4, 5].map((score) => <button type="button" key={score} onClick={() => setAnswer(question.id, score)} className={`grid size-11 place-items-center rounded-xl border text-sm font-bold ${value === score ? "border-violet-500 bg-violet-600 text-white" : "border-slate-200 bg-white text-slate-700"}`}>{score}</button>)}</div>;
+    if (question.question_type === "nps") return <div className="grid grid-cols-6 gap-2 sm:grid-cols-11">{Array.from({ length: 11 }, (_, score) => <button type="button" key={score} onClick={() => setAnswer(question.id, score)} className={`rounded-lg border py-2 text-xs font-bold ${value === score ? "border-violet-500 bg-violet-600 text-white" : "border-slate-200 bg-white text-slate-700"}`}>{score}</button>)}</div>;
+    if (question.question_type === "yes_no") return <select className={inputClass} value={typeof value === "boolean" ? String(value) : ""} onChange={(event) => { if (!event.target.value) { setAnswers((current) => { const next = { ...current }; delete next[question.id]; return next; }); } else setAnswer(question.id, event.target.value === "true"); }}><option value="">Choose…</option><option value="true">Yes</option><option value="false">No</option></select>;
+    return question.question_type === "long_text" ? <textarea className={inputClass + " py-3"} rows={5} value={typeof value === "string" ? value : ""} onChange={(event) => setAnswer(question.id, event.target.value)} /> : <input className={inputClass} value={typeof value === "string" ? value : ""} onChange={(event) => setAnswer(question.id, event.target.value)} placeholder="Type your answer" />;
+  }
+  async function submit() {
+    if (!survey) return; setSaving(true); setNotice("");
+    try { const key = sessionStorage.getItem(`brandsentinel-public-survey-${survey.id}`) || crypto.randomUUID(); sessionStorage.setItem(`brandsentinel-public-survey-${survey.id}`, key); await apiFetch(`/public-surveys/${survey.public_token}/responses`, { method: "POST", body: JSON.stringify({ anonymousSessionKey: key, answers: Object.entries(answers).map(([questionId, value]) => ({ questionId, value })) }) }); setSubmitted(true); } catch (error) { setNotice(error instanceof Error ? error.message : "Your response could not be submitted."); } finally { setSaving(false); }
+  }
+
+  if (loading) return <div className="grid min-h-[60vh] place-items-center text-sm text-slate-500"><Loader2 className="mr-2 animate-spin" size={18} />Loading survey…</div>;
+  if (!survey) return <div className="mx-auto max-w-xl px-6 py-20 text-center"><Card className="p-8"><h1 className="font-display text-2xl font-bold text-slate-950">Survey unavailable</h1><p className="mt-3 text-sm leading-6 text-slate-500">{notice || "This survey link is invalid, closed, or outside its response window."}</p></Card></div>;
+  return <main className="mx-auto max-w-3xl px-6 py-10 lg:py-16"><div className="mb-6 text-center"><div className="mx-auto grid size-12 place-items-center rounded-2xl bg-violet-50 text-violet-600"><ClipboardList size={22} /></div><Badge tone="violet">{survey.brands?.name || "Brand feedback"}</Badge><h1 className="mt-3 font-display text-4xl font-bold tracking-[-0.06em] text-slate-950">{survey.title}</h1><p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-slate-500">{survey.description || "Share your perspective in a few short questions."}</p><p className="mt-3 text-xs text-slate-400">{survey.anonymous ? "Anonymous response" : "Sign-in required for identified surveys"}</p></div><Card className="p-6 sm:p-8">{submitted ? <div className="py-14 text-center"><div className="mx-auto grid size-14 place-items-center rounded-2xl bg-emerald-100 text-emerald-700"><Check size={26} /></div><h2 className="mt-5 font-display text-2xl font-bold text-slate-950">Response received</h2><p className="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-500">{survey.thank_you_message}</p></div> : <><div className="space-y-5">{survey.survey_questions.sort((a, b) => a.position - b.position).map((question, index) => <div key={question.id} className="rounded-2xl border border-slate-200 p-5"><div className="flex items-start gap-3"><span className="grid size-7 shrink-0 place-items-center rounded-lg bg-violet-50 text-xs font-bold text-violet-700">{index + 1}</span><div className="min-w-0 flex-1"><p className="text-sm font-semibold leading-6 text-slate-950">{question.prompt}{question.required && <span className="ml-1 text-violet-600">*</span>}</p><div className="mt-3">{renderQuestion(question)}</div></div></div></div>)}</div>{notice && <div className="mt-5 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-800">{notice}</div>}<Button className="mt-6 w-full" onClick={() => void submit()} disabled={saving}>{saving ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}Submit anonymous response</Button><p className="mt-3 text-center text-xs leading-5 text-slate-400">Your response is validated and stored once per browser session for this shareable survey.</p></>}</Card></main>;
+}

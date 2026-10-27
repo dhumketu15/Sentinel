@@ -2,6 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { env, hasSupabaseConfig, hasUserScopedSupabaseConfig } from "../config/env.js";
 
 let adminClient: SupabaseClient | null = null;
+let serviceClient: SupabaseClient | null = null;
 
 export function getAdminClient(): SupabaseClient | null {
   if (!hasSupabaseConfig || !env.SUPABASE_URL) return null;
@@ -27,4 +28,21 @@ export function getUserScopedClient(accessToken: string): SupabaseClient | null 
     auth: { autoRefreshToken: false, persistSession: false },
     global: { headers: { Authorization: `Bearer ${accessToken}` } },
   });
+}
+
+export function getPublicClient(): SupabaseClient | null {
+  const key = env.SUPABASE_ANON_KEY ?? env.SUPABASE_PUBLISHABLE_KEY ?? env.SUPABASE_KEY;
+  if (!hasSupabaseConfig || !env.SUPABASE_URL || !key) return null;
+  return createClient(env.SUPABASE_URL, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
+
+export function getServiceClient(): SupabaseClient | null {
+  const key = env.SUPABASE_SERVICE_ROLE_KEY ?? env.SUPABASE_KEY;
+  if (!env.SUPABASE_URL || !key) return null;
+  if (!serviceClient) {
+    serviceClient = createClient(env.SUPABASE_URL, key, { auth: { autoRefreshToken: false, persistSession: false } });
+  }
+  return serviceClient;
 }
