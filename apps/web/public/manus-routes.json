@@ -9,6 +9,8 @@
     {"path":"/register","title":"Create account"},
     {"path":"/forgot-password","title":"Reset password"},
     {"path":"/app/overview","title":"Workspace overview"},
+    {"path":"/app/brands","title":"Brand profiles and guidelines"},
+    {"path":"/app/audits","title":"Content audits"},
     {"path":"/app/:section","title":"BrandSentinel workspace"}
   ]
 }
