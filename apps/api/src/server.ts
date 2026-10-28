@@ -19,6 +19,13 @@ app.use("/api/v1", apiRouter);
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(env.PORT, "0.0.0.0", () => {
-  logger.info({ port: env.PORT }, "BrandSentinel API listening");
-});
+// Vercel loads the Express app as a serverless handler. Keep the listener for
+// local development only; starting a persistent listener inside a Function
+// invocation causes FUNCTION_INVOCATION_FAILED responses.
+if (process.env.VERCEL !== "1") {
+  app.listen(env.PORT, "0.0.0.0", () => {
+    logger.info({ port: env.PORT }, "BrandSentinel API listening");
+  });
+}
+
+export default app;
